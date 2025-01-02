@@ -1,0 +1,172 @@
+/* =========================
+   1) Load the Lato font 
+   ========================= */
+/* If you used the @import approach, just remove the old @font-face blocks. */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+
+/* =========================
+   2) Base + Body Styles 
+   ========================= */
+   html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    font-size: 16.5px;
+    color: #333;
+    line-height: 1.6;
+    background-color: #fafafa; /* Subtle off-white background for a cleaner look */
+  }
+  
+  a {
+    color: #1772d0;    /* “brand” link color */
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+  a:hover,
+  a:focus {
+    color: #f09228;    /* accent color on hover */
+    text-decoration: none;
+  }
+  
+  /* =========================
+     3) Navbar Styles 
+     ========================= */
+  .navbar {
+    background-color: #fff;               /* White navbar for a clean look */
+    border-bottom: 1px solid #ddd;        /* Subtle border for separation */
+  }
+  
+  .navbar-brand {
+    color: #1772d0 !important;           /* Force brand color */
+    font-weight: 700 !important;         /* Make brand stand out */
+    font-size: 1.25rem !important;
+  }
+  
+  /* Navbar toggle icon (hamburger) for mobile */
+  .navbar-toggler {
+    border: none;
+  }
+
+  /* =========================
+     4) Headings & Section Titles 
+     ========================= */
+  h1, h2, h3, h4, h5 {
+    font-family: 'Lato', Verdana, Helvetica, sans-serif;
+    color: #111;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .name-large {
+    font-size: 2.0rem;  /* a bit larger than your original 32px (2rem = 32px, adjust as needed) */
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .custom-heading {
+    font-size: 1.3rem;  /* consistent sizing for section headings */
+    margin-top: 3rem;   /* breathing room before headings */
+    margin-bottom: 1rem;
+    font-weight: 700;
+    color: #111;
+  }
+  
+  /* =========================
+     5) Horizontal Rule 
+     ========================= */
+  .section-divider {
+    border: 0;
+    height: 1px;
+    background: #ccc;
+    margin: 2rem 0; /* more breathing room around horizontal rules */
+  }
+  
+  /* =========================
+     6) Paper / Row Layout 
+     ========================= */
+  .paper-row {
+    min-height: 140px; /* Adjust as you like; 160px might be tall for short text. */
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem; /* consistent spacing between rows */
+  }
+  
+  .paper-image {
+    width: 120px;      /* or whatever fixed dimension you want */
+    height: 120px; 
+    object-fit: contain;  /* show entire image within the box, with possible empty space */
+    display: block;
+    margin: 0 auto;
+    border-radius: 4px;  
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Paper title bigger than default */
+  .paper-title {
+    font-size: 17px; 
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* Example: highlight for the authors' names */
+  .author-highlight {
+    color: #1772d0;  /* brand color or any strong accent color */
+    font-weight: 700;
+  }
+  
+  /* =========================
+     7) Profile & Project Images 
+     ========================= */
+  .profile-img,
+  .paper-image {
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .profile-img:hover,
+  .paper-image:hover {
+    transform: scale(1.03);
+  }
+
+  .profile-image {
+    max-width: 240px;
+    height: auto;
+    border-radius: 6px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  
+  /* =========================
+     8) Social Links 
+     ========================= */
+  .social-links a {
+    display: inline-block;
+    margin-right: 1rem;
+    font-weight: 400;
+    font-size: 1rem;
+  }
+  
+  /* If you want them to be subtle icons, consider 
+     using font-awesome or brand icons. 
+     Example:
+       <i class="fab fa-twitter"></i> Twitter
+     Then style .fab accordingly.
+  */
+  
+  /* =========================
+     9) Footer / Misc 
+     ========================= */
+  .text-end.text-muted {
+    color: #888 !important;
+    margin-top: 3rem; /* push the footer down a bit */
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+  
