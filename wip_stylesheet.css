@@ -17,7 +17,7 @@
   
   body {
     font-family: 'Lato', Verdana, Helvetica, sans-serif;
-    font-size: 16.5px;
+    font-size: 15px;
     color: #333;
     line-height: 1.6;
     background-color: #fafafa; /* Subtle off-white background for a cleaner look */
@@ -109,7 +109,7 @@
   
   /* Paper title bigger than default */
   .paper-title {
-    font-size: 17px; 
+    font-size: 16px; 
     font-weight: 700;
     margin-bottom: 0.25rem;
   }
