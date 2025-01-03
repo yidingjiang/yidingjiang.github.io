@@ -15,6 +15,24 @@
     box-sizing: border-box;
   }
   
+  @media (max-width: 768px) {
+    body {
+      padding: 0 0.5rem; /* Smaller padding for mobile */
+    }
+  }
+  
+  .container {
+    max-width: 1200px; /* Center content on larger screens */
+    margin: 0 auto;
+    padding: 0 7rem;
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 0 0.5rem; /* Narrower padding on mobile */
+    }
+  }
+
   body {
     font-family: 'Lato', Verdana, Helvetica, sans-serif;
     font-size: 15px;
@@ -91,7 +109,7 @@
      6) Paper / Row Layout 
      ========================= */
   .paper-row {
-    min-height: 140px; /* Adjust as you like; 160px might be tall for short text. */
+    min-height: 120px; /* Adjust as you like; 160px might be tall for short text. */
     display: flex;
     align-items: center;
     margin-bottom: 1.5rem; /* consistent spacing between rows */
