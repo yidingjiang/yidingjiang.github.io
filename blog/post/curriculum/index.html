@@ -137,7 +137,7 @@ L_M(X) = L(M) + L(X \mid M)=L(\theta) - \sum_{t=1}^n \text{log} \thinspace p_\th
 <h3 id="connection-to-data-selection-and-curriculum-learning">Connection to data selection and curriculum learning</h3>
 <p>Previously, we assumed Alice sends the dataset \(X\) to Bob in some order \(x_1, x_2, x_3, \cdots\). But the ordering of messages is actually a choice because the dataset \(X\) is typically made up of exchangeable <strong>documents</strong><sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>, which we denote by \(d_i\):</p>
 <p>\[
-X = (d_1, d_2, \dots) = (d_2, d_1, \dots), \quad \text{where} \quad d_1 = (x_1, x_2, x_3), d_2=(x_4, x_5, x_6, x_7), \dots
+X = (\underbrace{x_1, x_2, x_3}_{d_1}, \underbrace{x_4, x_5, x_6, x_7}_{d_2}, \dots) = (\underbrace{x_4, x_5, x_6, x_7}_{d_2}, \underbrace{x_1, x_2, x_3}_{d_1}, \dots).
 \]</p>
 <p>Since Alice can send documents to Bob in any order she wants, she can choose an ordering that minimizes the description length. If some documents contain information that is shared across many documents, sending them first could help reduce the number of bits required to send later documents.</p>
 <p>As we saw earlier, this is equivalent to choosing the ordering of documents that minimizes the AULC, so we arrive at a neat and principled objective for curriculum learning and data selection. This objective is also intuitive from a learning perspective: training on certain documents first could make it easier to learn other documents later on, leading to a lower AULC.</p>
