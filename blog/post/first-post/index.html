@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
+  <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>A compression perspective on curriculum learning | Yiding&#39;s blog</title>
@@ -123,10 +123,15 @@ L_M(X) = L(M) + L(X \mid M)=L(\theta) - \sum_{t=1}^n \text{log} \thinspace p_\th
   (5) update θ₂ = update(θ₁, x₂)        (5) update θ₂ = update(θ₁, x₂)
          │                                              │
          │                  ... repeat ...              │
-</code></pre><p>Under this setup, the total number of bits Alice needs to send to Bob in order to communicate $X$ is:</p>
+</code></pre><p>Under this setup, the total number of bits Alice needs to send to Bob in order to communicate \(X\) is:</p>
 <p>\[L_\text{PC}(X) = L(\texttt{train.py}) + \sum_{t=1}^n L(m_t) = L(\texttt{train.py}) -\sum_{t=1}^n \text{log} \thinspace p_{\theta_t}(x_t \mid x_{&lt;t}). \]</p>
-<p>Notice that the second term is adding up the loss of the model at each training step \(t\), so it is precisely the <strong>area under the training loss curve</strong> (AUC).
-<img src="/blog/curriculum/AUC.png" alt="AUC"></p>
+<p>Notice that the second term is adding up the loss of the model at each training step \(t\), so it is precisely the <strong>area under the training loss curve</strong> (AUC).</p>
+
+
+<center> 
+<img src="/blog/curriculum/AUC.png#center" alt="drawing" width="450"/>
+</center>
+
 <p>The first term \(L(\texttt{train.py})\) can be negligible compared to the size of \(X\): a minimal implementation for training a neural network is quite small<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>, and it does not grow with model or dataset size. Unlike in the MDL picture, Alice never has to send Bob the model parameters so increasing model size does not increase the description length. In fact, larger models result in better compression under prequential coding since larger models tend to train faster, so this coding scheme is particularly suitable for deep learning (<a href="https://arxiv.org/abs/1802.07044">Blier &amp; Ollivier (2018)</a>).</p>
 <p>This algorithm can achieve a great compression ratio but it is not very practical since both the compression and decompression processes require training a model. In fact, one of the most powerful instantiations of prequential coding is the <a href="https://en.wikipedia.org/wiki/Solomonoff%27s_theory_of_inductive_inference">Solomonoff Induction</a>, a mathematically optimal but unfortunately incomputable procedure for sequence induction.</p>
 <h3 id="connection-to-data-selection-and-curriculum-learning">Connection to data selection and curriculum learning</h3>
