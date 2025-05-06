@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>A compression perspective on curriculum learning | Yiding&#39;s blog</title>
+    <link rel="stylesheet" href="/blog/css/style.css" />
+    <link rel="stylesheet" href="/blog/css/fonts.css" />
+    
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)']],
+    displayMath: [['\\[','\\]']]
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/blog/">Blogposts</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">A compression perspective on curriculum learning</span></h1>
+<h2 class="author">Yiding Jiang and Allan Zhou</h2>
+<h2 class="date">2025/05/06</h2>
+</div>
+
+<main>
+<p>A fundamental property of an intelligent system is the ability to predict, be it predicting the label of an image, the optimal action to take, or the next token in a sentence. Having a good predictive model is intimately tied to having a good compression algorithm. Conversely, a strong compression algorithm must have a good model that can identify and leverage patterns in the data.</p>
+<p>While the relationship between compression and intelligence has been thoroughly discussed<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>, we will focus here on a particularly interesting relationship between compression and massively overparameterized models, which also naturally lends itself to an objective for data selection and curriculum learning.</p>
+<h2 id="deep-learning-and-the-minimum-description-length-mdl-principle">Deep learning and the minimum description length (MDL) principle</h2>
+<p>Suppose Alice wants to send a dataset \(X = (x_1, x_2, \dots, x_n)\) to Bob over a noiseless communication channel that incurs some cost for each bit sent. We use \(L(\cdot)\) to denote <strong>description length</strong>, or the number of bits Alice needs to use in order to send an object to Bob. If \(X\) contains symbols (e.g., tokens or bytes) from a discrete vocabulary \(V\), then naively, each symbol can be encoded with \(\text{log} \thinspace |V|\) bits. So at first glance, the description length of the whole dataset is \(L(X)=n \thinspace \text{log} \thinspace|V|\) bits.</p>
+<p>To minimize the number of bits sent, Alice can use a model \(M\) to compress \(X\). In particular, suppose \(M\) is a probabilistic model \(p_\theta(x_t \mid x_{&lt;t})\) that predicts the next symbol based on the previous ones. By using an <a href="https://en.wikipedia.org/wiki/Entropy_coding">entropy coding</a> (such as <a href="https://en.wikipedia.org/wiki/Arithmetic_coding">arithmetic coding</a>), she can send \(x_t\) to Bob using \(-\log \thinspace p_\theta(x_t \mid x_{&lt;t})\) bits. Then she can send the entire dataset using \(-\sum_{t=1}^n \text{log} \thinspace p_\theta(x_t \mid x_{&lt;t})\) bits. If \(M\) is a good predictive model, then this could be much smaller than the naive cost of \(n \thinspace \text{log} \thinspace|V|\) bits.</p>
+<p>However, this approach requires Bob to have the model \(M\), so that he can decode the data. Since Alice needs to send Bob the parameters \(\theta\) of this probabilistic model, the total description length of the dataset under this scheme is:</p>
+<p>\[
+L_M(X) = L(M) + L(X \mid M)=L(\theta) - \sum_{t=1}^n \text{log} \thinspace p_\theta(x_t \mid x_{&lt;t}).
+\]</p>
+<p>Graphically:</p>
+<pre tabindex="0"><code>┌──────────────────────────────┐           ┌──────────────────────────────┐
+│            Alice             │           │             Bob              │
+└──────────────────────────────┘           └──────────────────────────────┘
+         │                                              │
+ train model M with weights θ                           │
+         │                                              │
+         │                                              │
+         ├─────────────────── send θ ──────────────────►│
+         │                                              │
+         │                                          receive θ
+         │                                              │
+ encode x₁ using p_θ(x₁)                                │
+   (emits message m₁)                                   │
+         │                                              │
+         ├───────── send m₁(-log p_θ(x₁) bits) ────────►│
+         │                                              │
+         │                                     decode m₁ with p_θ to get x₁
+         │                                              │
+ encode x₂ using p_θ(x₂)                                │
+   (emits message m₂)                                   │
+         │                                              │
+         ├───────── send m₂ (-log p_θ(x₂) bits) ───────►│
+         │                                              │
+         │                                     decode m₂ with p_θ to get x₂
+         │                                              │
+         │                 ... repeat ...               │
+</code></pre><p>The minimum description length principle (MDL, <a href="https://www.sciencedirect.com/science/article/abs/pii/0005109878900055">Rissanen, 1978</a>; <a href="https://homepages.cwi.nl/~pdg/book/book.html">Grünwald, 2007</a>) suggests the best model \(M\) for describing \(X\) is one that minimizes \(L_M(X)\). It has been influential as a guiding principle in machine learning, with applications ranging from model selection to regularization, model compression, and more (<a href="https://ieeexplore.ieee.org/abstract/document/86996?casa_token=KkfF5xNnOp8AAAAA:ZoEIDiVO8bF2dd1sjZQ9G7zfc1M3g005sc7mfeuCwFm4mHUeEAJ8ezCxepW0yV99ffbxBEc">Barron &amp; Cover, 1991</a>; <a href="https://direct.mit.edu/neco/article-abstract/4/3/448/5654/A-Practical-Bayesian-Framework-for-Backpropagation">MacKay, 1992</a>; <a href="https://www.tandfonline.com/doi/abs/10.1198/016214501753168398">Hansen &amp; Yu, 2011</a>).</p>
+<p>The problem with applying the MDL principle to deep learning is that practical models are simply too &ldquo;big.&rdquo; If the model has billions of parameters, the upfront cost \(L(\theta)\) incurred when Alice sends \(\theta\) to Bob drowns out any gains from using the model to encode the dataset.</p>
+<p>To make the problem worse, large models are often better than small models in practice, yet they often yield a larger description length \(L_M(X)\), due to the larger \(L(\theta)\). This leads to an apparent contradiction with the MDL principle where the model with larger description length is actually better. This problem comes from the fact that we don&rsquo;t know how to compress large neural networks well, even though larger models have likely learned a <em>simpler</em> representation of the data<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>.</p>
+<h3 id="prequential-coding">Prequential coding</h3>
+<p>We now describe a different compression protocol for \(X\) called <strong>prequential coding</strong><sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup> that avoids many of the issues with the MDL protocol.</p>
+<p>Since the main issue with the previous MDL approach is the cost \(L(\theta)\) of sending model parameters, the prequential coding approach avoids sending any model parameters. Instead, both Alice and Bob will separately train the same model as she sends him the dataset \(X\). In particular, the process looks as follows:</p>
+<ol>
+<li>Alice sends Bob a deterministic training script \(\texttt{train.py}\) that initializes an LLM with a fixed random seed and implements its \(\texttt{update}\) function.</li>
+<li>Alice and Bob both initialize their LLMs and obtain the same model \(p_{\theta_0}\) (since the random seed is fixed)</li>
+<li>Alice encodes \(x_1\) with \(p_{\theta_{0}}(x_1)\) into a message \(m_1\) of length \(-\text{log} p_{\theta_{0}}(x_1)\), and sends the message to Bob</li>
+<li>Bob receives \(m_1\) and uses \(p_{\theta_{0}}\) to decode \(x_1\).</li>
+<li>Now both Alice and Bob have \(x_1\) and they both take a gradient step on \(x_1\) according to \(\texttt{train.py}\), \(\theta_1 = \texttt{update}(x_0, \theta_0)\) and end up with the same copy of \(\theta_1\).</li>
+<li>Go to step 3 and repeat until the whole dataset has been sent.</li>
+</ol>
+<p>Graphically:</p>
+<pre tabindex="0"><code>┌──────────────────────────────┐           ┌──────────────────────────────┐
+│            Alice             │           │             Bob              │
+└──────────────────────────────┘           └──────────────────────────────┘
+         │                                              │
+         |                                              │
+         ├──────── (1) send train.py and seed ─────────►│
+         │                                              │
+  (2) initialize θ₀                           (2) initialize θ₀
+         │                                              │
+  (3) encode x₁ using p_θ₀(x₁)                          │
+      (emits message m₁)                                │
+         │                                              │
+         │                                              │
+         ├──────── send m₁ (-log p_θ₀(x₁) bits) ───────►│
+         │                                              │
+         │                               (4) decode m₁ to recover x₁
+         │                                              │
+(5) update θ₁ = update(θ₀, x₁)          (5) update θ₁ = update(θ₀, x₁)
+         │                                              │
+         ├──────────────────────────────────────────────│
+         ├──────────────────────────────────────────────│
+         │                                              │
+  (3) encode x₂ using p_θ₁(x₂)                          │
+       (emits message m₂)                               │
+         │                                              │
+         │                                              │
+         ├──────── send m₂ (-log p_θ₀(x₂) bits) ───────►│
+         │                                              │
+         │                               (4) decode m₂ to recover x₂
+         │                                              │
+  (5) update θ₂ = update(θ₁, x₂)        (5) update θ₂ = update(θ₁, x₂)
+         │                                              │
+         │                  ... repeat ...              │
+</code></pre><p>Under this setup, the total number of bits Alice needs to send to Bob in order to communicate \(X\) is:</p>
+<p>\[L_\text{PC}(X) = L(\texttt{train.py}) + \sum_{t=1}^n L(m_t) = L(\texttt{train.py}) -\sum_{t=1}^n \text{log} \thinspace p_{\theta_t}(x_t \mid x_{&lt;t}). \]</p>
+<p>Notice that the second term is adding up the loss of the model at each training step \(t\), so it is precisely the <strong>area under the training loss curve</strong> (AULC).</p>
+
+
+<center> 
+<img src="/blog/curriculum/AUC.png#center" alt="drawing" width="450"/>
+</center>
+
+<p>The first term \(L(\texttt{train.py})\) can be negligible compared to the size of \(X\): a minimal implementation for training a neural network is quite small<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>, and it does not grow with model or dataset size. Unlike in the MDL picture, Alice never has to send Bob the model parameters so increasing model size does not increase the description length. In fact, larger models result in better compression under prequential coding since larger models tend to train faster, so this coding scheme is particularly suitable for deep learning (<a href="https://arxiv.org/abs/1802.07044">Blier &amp; Ollivier (2018)</a>).</p>
+<p>This algorithm can achieve a great compression ratio but it is not very practical since both the compression and decompression processes require training a model. In fact, one of the most powerful instantiations of prequential coding is the <a href="https://en.wikipedia.org/wiki/Solomonoff%27s_theory_of_inductive_inference">Solomonoff Induction</a>, a mathematically optimal but unfortunately incomputable procedure for sequence induction.</p>
+<h3 id="connection-to-data-selection-and-curriculum-learning">Connection to data selection and curriculum learning</h3>
+<p>Previously, we assumed Alice sends the dataset \(X\) to Bob in some order \(x_1, x_2, x_3, \cdots\). But the ordering of messages is actually a choice because the dataset \(X\) is typically made up of exchangeable <strong>documents</strong><sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup>, which we denote by \(d_i\):</p>
+<p>\[
+X = (d_1, d_2, \dots) = (d_2, d_1, \dots), \quad \text{where} \quad d_1 = (x_1, x_2, x_3), d_2=(x_4, x_5, x_6, x_7), \dots
+\]</p>
+<p>Since Alice can send documents to Bob in any order she wants, she can choose an ordering that minimizes the description length. If some documents contain information that is shared across many documents, sending them first could help reduce the number of bits required to send later documents.</p>
+<p>As we saw earlier, this is equivalent to choosing the ordering of documents that minimizes the AULC, so we arrive at a neat and principled objective for curriculum learning and data selection. This objective is also intuitive from a learning perspective: training on certain documents first could make it easier to learn other documents later on, leading to a lower AULC.</p>
+<p>Formally, suppose we have \(n_D\) documents, and we are training a model with stochastic gradient descent for a single epoch (the model sees every symbol once). Our objective is to find a <strong>curriculum</strong>, or an ordering of the \(n_D\) documents that minimizes the description length. In our setting, this is equivalent to finding a permutation \(\sigma:[n_D] \rightarrow [n_D]\) of the documents (i.e., a bijection between orderings) that minimizes the area under the training loss curve<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup>:</p>
+<p>\[
+\text{arg}\min_\sigma -\sum_{t=1}^{n_D} \text{log} p_{\theta_t}\left(d_{\sigma(t)} \mid d_{\sigma(1)}, \cdots, d_{\sigma(t-1)}\right).
+\]</p>
+<p>Solving this problem is computationally challenging in practice because the number of permutations is factorially large. If computation resource is not a constraint, a straightforward strategy would be to train every permutation and pick the one with the smallest AULC. This strategy is not practical, but it would be nonetheless useful to know whether there exist permutations that are better than random. In <a href="https://arxiv.org/abs/2410.11820">Adaptive Data Optimization (ADO)</a>, we demonstrate a meta-learning approach that can find good permutations for training small multi-layer perceptrons (MLPs). Our meta-learning method produces a curriculum that significantly outperforms training on randomly shuffled documents. This result shows it is likely that good curricula exist for most realistic problems, but they are computationally difficult to find. We refer the interested reader to Appendix B of the ADO paper for details.</p>
+<p><img src="/blog/curriculum/meta_learning.png#center" alt="meta"></p>
+<p>Although our example here focuses on single-epoch training with minibatch size 1, the prequential coding perspective on data selection is much more general. For example, Alice and Bob are not obligated to train the model on individual data points as they are being transmitted. They can choose to skip updating the model on some data points or choose to train more on data that has already been transmitted (similar to experience replay). Additionally, Alice can choose to skip sending some data points and transmit all of the skipped data points at the end without updating the model&ndash;this is equivalent to data filtering<sup id="fnref:7"><a href="#fn:7" class="footnote-ref" role="doc-noteref">7</a></sup>.</p>
+<h2 id="a-practical-approach">A practical approach</h2>
+<p>The meta-learning approach above works for small neural networks, but does not scale to practical settings. To design a practical method for data selection, we need to make some assumptions about the problem&rsquo;s structure.</p>
+<p>One popular structural assumption is that documents can be grouped into different <strong>domains</strong>.  For example, we could group all documents from Wikipedia into one domain and all documents from Reddit into another domain. Under this grouping strategy, a well known dataset such as <a href="https://pile.eleuther.ai/">The Pile</a> has 22 domains. We assume that documents within each domain are approximately homogeneous, so that training on one document gives &ldquo;similar&rdquo; information as training on other documents. This drastically simplifies the data selection problem, since we only need to find a curriculum over the domains instead of over all documents. In particular, at each training step \(t\) we can output a <strong>mixture</strong> distribution \(\pi(t) \in \Delta^K\) controlling how we sample mini-batches from \(K\) domains. Still, even with the imposed structure of domains, the optimization remains difficult.</p>
+<p>The hardest part of optimizing data mixtures is that it is hard to know the performance of a model on a data mixture without actually training on it, but training a model to test each proposed data mixture is expensive. ADO resolves this issue by fitting <strong>per-domain scaling laws</strong> that model the loss curve on each domain as a function of the number of <em>total</em> data points seen. Scaling laws are very cheap to fit, and can reliably forecast the loss of domains into the future. This allows us to continuously estimate the per-domain loss curves throughout the training, and adjust the data mixture in response. ADO is designed as a method that greedily tunes the mixture to optimize the loss AULC, using the loss curve forecasts provided by scaling laws. Under the prequential coding framework, we can view this as greedily minimizing the total number of bits required to communicate the training dataset.</p>
+<p>ADO is a practical method because it adds minimal computational overhead and achieves better downstream performance than competing methods. That being said, ADO actually does not minimize the observed AULC in practice, but that is a topic for a different blog post on algorithmic information theory :)</p>
+<h3 id="final-thoughts">Final thoughts</h3>
+<p>We introduce a natural, principled objective for curriculum learning and data selection via prequential coding, by casting curriculum design as explicit minimization of the training‐loss AULC. While naively optimizing this objective is intractable, we believe that this compression‐driven viewpoint could be an elegant and promising principle on which new data selection and curriculum learning algorithms can be designed. For a more detailed discussion on Adaptive Data Optimization (ADO), see <a href="https://bland.website/notes/ado/">this blog post</a>.</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>See <a href="https://www.sciencedirect.com/science/article/abs/pii/0005109878900055">Rissanen, 1978</a>; <a href="https://link.springer.com/chapter/10.1007/3-540-62858-4_69">Li &amp; Vitányi, 1997</a>; <a href="http://www.hutter1.net/ai/uaibook.htm">Hutter, 2005</a>.&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>There are some results that show that <a href="https://arxiv.org/abs/2211.13609">larger models can be easier to compress</a>. Nonetheless, it is unclear whether these techniques would continue to work for even larger models or whether new techniques be needed.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>Prequential coding was first formalized in statistical theory by <a href="https://www.jstor.org/stable/2981683">Dawid (1984)</a> and later detailed in the MDL context by <a href="https://homepages.cwi.nl/~pdg/book/book.html">Grünwald (2007)</a>. More recently, it was highlighted in the talk <a href="https://www.youtube.com/watch?v=dO4TPJkeaaU&amp;themeRefresh=1">&ldquo;Compression for AGI&rdquo;</a>.&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>For example, see <a href="https://github.com/karpathy/llm.c">llm.c</a> or <a href="https://github.com/tinygrad/tinygrad">tinygrad</a>.&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5">
+<p>We use &ldquo;documents&rdquo; to refer to exchangeable units of symbols representing any modality. A document could be a distinct text, image, video, audio clip, etc.&#160;<a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:6">
+<p>To simplify notation, this expression also assumes the model updates after each document is sent, rather than after each token.&#160;<a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:7">
+<p>Strategies that involve selective updating of the model are valid under the prequential coding setup, so long as the strategy is pre-determined in the training script, guaranteeing that their models always receive the same updates and stay in sync.&#160;<a href="#fnref:7" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</main>
+
+  <footer>
+  
+  
+  <hr/>
+  © Yiding Jiang 2025 | <a href="https://yidingjiang.github.io/">My homepage</a>
+  
+  </footer>
+  </body>
+</html>
+
