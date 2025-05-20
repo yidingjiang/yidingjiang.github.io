@@ -5,6 +5,13 @@ body {
   line-height: 1.5;
 }
 
+.no-preview {
+  display: block;
+}
+.no-preview img {
+  display: block;
+}
+
 /* header and footer areas */
 .menu { padding: 0; }
 .menu li { display: inline-block; }
