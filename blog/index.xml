@@ -6,8 +6,15 @@
     <description>Recent content in Blogposts on Yiding&#39;s blog</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 06 May 2025 20:29:38 +0800</lastBuildDate>
+    <lastBuildDate>Wed, 25 Jun 2025 17:57:46 -0400</lastBuildDate>
     <atom:link href="https://yidingjiang.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Era of Exploration</title>
+      <link>https://yidingjiang.github.io/blog/post/exploration/</link>
+      <pubDate>Wed, 25 Jun 2025 17:57:46 -0400</pubDate>
+      <guid>https://yidingjiang.github.io/blog/post/exploration/</guid>
+      <description>&lt;p&gt;Large language models are the unintended byproduct of about three decades worth of freely accessible human text online. Ilya Sutskever compared this reservoir of information to &lt;a href=&#34;https://www.youtube.com/watch?v=YD-9NG1Ke5Y&#34;&gt;fossil fuel&lt;/a&gt;, abundant but ultimately finite. Some studies suggest that, at current token‑consumption rates, frontier labs could exhaust the highest‑quality English web text well before the decade ends. Even if those projections prove overly pessimistic, one fact is clear: today’s models consume data far faster than humans can produce it.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>A compression perspective on curriculum learning</title>
       <link>https://yidingjiang.github.io/blog/post/curriculum/</link>
