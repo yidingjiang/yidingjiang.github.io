@@ -1,4 +1,5 @@
 body {
+  position: relative;
   max-width: 800px;
   margin: auto;
   padding: 1em;
@@ -28,6 +29,12 @@ hr {
   border-style: dashed;
   color: #ddd;
 }
+#TableOfContents, #TOC {
+  /* border: 1.5px solid #eee; */
+  border-radius: 5px;
+  font-size: 1.05rem;
+}
+
 
 /* code */
 pre {

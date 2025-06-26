@@ -1,0 +1,18 @@
+/* -- Table of Contents styling for XMin ----------------------- */
+#TableOfContents, #TOC {           /* Hugo names the div like this */
+  float: right;                    /* sidebar-style */
+  width: 18em;                     /* tweak to taste */
+  margin: 0 0 1em 1.5em;           /* gap from the text */
+  padding: 0.6em 1em;
+  border: 1px solid #eee;
+  border-radius: 5px;              /* same style as author’s demo */
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+main {                             /* keep body text clear of TOC */
+  margin-right: 20em;
+}
+@media (max-width: 800px) {        /* fall back on narrow viewports */
+  #TableOfContents { float: none; width: auto; margin: 1em 0; }
+  main { margin-right: 0; }
+}

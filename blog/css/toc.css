@@ -1,0 +1,28 @@
+/* --- TOC lives in the outside margin -------------------------- */
+.container         { position: relative; }   /* make it an offset parent */
+
+#TableOfContents {
+  position: absolute;       /* pop it out of the flow */
+  left: 100%;               /* start at container’s right edge … */
+  margin-left: 2rem;        /* … then add a gutter */
+  top: 6rem;                /* roughly header height */
+  width: 18rem;
+
+  /* decorative bits (keep whatever styles you already like) */
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  font-size: .9rem; line-height: 1.45;
+  overflow-y: auto;
+  max-height: calc(100vh - 8rem);
+}
+
+@media (max-width: 1050px) {   /* fall back when viewport gets narrow */
+  #TableOfContents {
+    position: static;
+    margin: 1.5rem 0;
+    width: auto;
+    max-height: none;
+  }
+}

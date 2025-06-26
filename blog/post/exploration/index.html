@@ -43,6 +43,17 @@ window.MathJax = {
 <h2 class="date">2025/06/25</h2>
 </div>
 
+
+<nav id="TableOfContents">
+  <ul>
+    <li><a href="#pretraining-is-exploration">Pretraining is exploration</a></li>
+    <li><a href="#exploration-helps-generalization">Exploration helps generalization</a></li>
+    <li><a href="#two-axes-of-scaling-exploration">Two axes of scaling exploration</a></li>
+    <li><a href="#final-thoughts">Final thoughts</a></li>
+  </ul>
+</nav>
+
+
 <main>
 <p>Large language models are the unintended byproduct of about three decades worth of freely accessible human text online. Ilya Sutskever compared this reservoir of information to <a href="https://www.youtube.com/watch?v=YD-9NG1Ke5Y">fossil fuel</a>, abundant but ultimately finite. Some studies suggest that, at current token‑consumption rates, frontier labs could exhaust the highest‑quality English web text well before the decade ends. Even if those projections prove overly pessimistic, one fact is clear: today’s models consume data far faster than humans can produce it.</p>
 <p>David Silver and Richard Sutton call this coming phase the “<a href="https://storage.googleapis.com/deepmind-media/Era-of-Experience%20/The%20Era%20of%20Experience%20Paper.pdf">Era of Experience</a>,”  where meaningful progress will depend on data that learning agents generate for themselves. In this post, I want to build on their statement further: the bottleneck is not having just <em>any</em> experience but collecting the <em>right</em> kind of experience that benefits learning. The next wave of AI progress will hinge less on stacking parameters and more on exploration, the process of acquiring new and informative experience.</p>
@@ -109,8 +120,8 @@ window.MathJax = {
 <h2 id="final-thoughts">Final thoughts</h2>
 <p>I could keep unfolding more tangents &ndash; better <a href="https://arxiv.org/abs/1908.06976">curiosity objectives</a>,  <a href="https://arxiv.org/abs/2406.04268">open-endedness</a> , <a href="https://arxiv.org/abs/2502.17543">meta‑exploration</a> that learns how to explore &ndash; but I think it is more important to make the high-level point clear.</p>
 <p>Existing paradigms of scaling have been incredibly effective but all paradigms will eventually saturate. The question is where to pour the next orders of magnitude of compute. I’ve argued that exploration &ndash; both world sampling and path sampling &ndash; offers a promising direction. We don’t yet know the right scaling laws, the right environment generators, or the right exploration objectives, but intuitively they should be possible. The coming years will decide whether exploration can stretch our flops further on top of the existing paradigms. I think the bet is worth making.</p>
-<h4 id="acknowledgement">Acknowledgement</h4>
-<p>Many thanks to Allan Zhou, Sam Sokota, Minqi Jiang, Ellie Haber, Alex Robey, Swaminathan Gurumurthy, Kevin Li, Calvin Luo, and Zico Kolter for their feedback and discussion on the draft.</p>
+<p><strong>Acknowledgement</strong></p>
+<p>Many thanks to Allan Zhou, Sam Sokota, Minqi Jiang, Ellie Haber, Alex Robey, Swaminathan Gurumurthy, Kevin Li, Calvin Luo, Abitha Thankaraj, and Zico Kolter for their feedback and discussion on the draft.</p>
 <div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
